@@ -1,0 +1,560 @@
+{
+  "title": "PipeCD yaml schema",
+  "id": "https://github.com/pipe-cd/pipecd/releases/tag/v0.26.0",
+  "$schema": "http://json-schema.org/2020-12/schema#",
+  "type": "object",
+  "required": [
+    "apiVersion",
+    "kind",
+    "spec"
+  ],
+  "definitions": {
+    "kubernetesDeploymentInput": {
+      "properties": {
+        "manifests": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of manifest files in the application directory used to deploy. Empty means all manifest files in the directory will be used.",
+          "uniqueItems": true
+        },
+        "kubectlVersion": {
+          "type": "string",
+          "description": "Version of kubectl will be used. Empty means the default version will be used."
+        },
+        "kustomizeVersion": {
+          "type": "string",
+          "description": "Version of kustomize will be used. Empty means the default version will be used."
+        },
+        "kustomizeOptions": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "List of options that should be used by Kustomize commands."
+        },
+        "helmVersion": {
+          "type": "string",
+          "description": "Version of helm will be used. Empty means the default version will be used."
+        },
+        "helmChart": {
+          "$ref": "#/definitions/helmChart",
+          "description": "Where to fetch helm chart."
+        },
+        "helmOptions": {
+          "$ref": "#/definitions/helmOptions",
+          "description": "Configurable parameters for helm commands."
+        },
+        "namespace": {
+          "type": "string",
+          "description": "The namespace where manifests will be applied."
+        },
+        "autoRollback": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically reverts all deployment changes on failure. Default is true."
+        }
+      }
+    },
+    "helmChart": {
+      "properties": {
+        "gitRemote": {
+          "type": "string",
+          "description": "Git remote address where the chart is placing. Empty means the same repository."
+        },
+        "ref": {
+          "type": "string",
+          "description": "The commit SHA or tag value. Only valid when gitRemote is not empty."
+        },
+        "path": {
+          "type": "string",
+          "description": "Relative path from the repository root to the chart directory."
+        },
+        "repository": {
+          "type": "string",
+          "description": "The name of a registered Helm Chart Repository."
+        },
+        "name": {
+          "type": "string",
+          "description": "The chart name."
+        },
+        "version": {
+          "type": "string",
+          "description": "The chart version."
+        }
+      }
+    },
+    "helmOptions": {
+      "properties": {
+        "releaseName": {
+          "type": "string",
+          "description": "The release name of helm deployment. By default, the release name is equal to the application name."
+        },
+        "valueFiles": {
+          "type": "array",
+          "item": {
+            "type": "string"
+          },
+          "description": "List of value files should be loaded."
+        },
+        "setFiles": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "List of file path for values."
+        },
+        "apiVersions": {
+          "type": "array",
+          "item": {
+            "type": "string"
+          },
+          "description": "Kubernetes api versions used for Capabilities.APIVersions."
+        },
+        "kubeVersion": {
+          "type": "string",
+          "description": "Kubernetes version used for Capabilities.KubeVersion."
+        }
+      }
+    },
+    "deploymentTrigger": {
+      "properties": {
+        "onCommit": {
+          "$ref": "#/definitions/onCommit"
+        },
+        "onCommand": {
+          "$ref": "#/definitions/onCommand"
+        },
+        "onOutOfSync": {
+          "$ref": "#/definitions/onOutOfSync"
+        },
+        "onChain": {}
+      }
+    },
+    "onCommit": {
+      "properties": {
+        "disabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to exclude application from triggering target when new Git commits touched it. Default is false."
+        },
+        "path": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of directories or files where any changes of them will be considered as touching the application. Regular expression can be used. Empty means watching all changes under the application directory.",
+          "uniqueItems": true
+        }
+      }
+    },
+    "onCommand": {
+      "properties": {
+        "disabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to exclude application from triggering target when received a new SYNC command. Default is false."
+        }
+      }
+    },
+    "onOutOfSync": {
+      "properties": {
+        "disabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to exclude application from triggering target when application is at OUT_OF_SYNC state. Default is true."
+        },
+        "minWindow": {
+          "type": "string",
+          "description": "Minimum amount of time must be elapsed since the last deployment. This can be used to avoid triggering unnecessary continuous deployments based on OUT_OF_SYNC status. Default is 5m."
+        }
+      }
+    },
+    "deploymentPlanner": {
+      "properties": {
+        "alwaysUsePipeline": {
+          "type": "boolean",
+          "default": false,
+          "description": "Always use the defined pipeline to deploy the application in all deployments. Default is false."
+        }
+      }
+    },
+    "commitMatcher": {
+      "properties": {
+        "quickSync": {
+          "type": "string",
+          "description": "Regular expression string to forcibly do QuickSync when it matches the commit message."
+        },
+        "pipeline": {
+          "type": "string",
+          "description": "Regular expression string to forcibly do Pipeline when it matches the commit message."
+        }
+      }
+    },
+    "kubernetesQuickSync": {
+      "properties": {
+        "addVariantLabelToSelector": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether the PRIMARY variant label should be added to manifests if they were missing. Default is false."
+        },
+        "prune": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether the resources that are no longer defined in Git should be removed or not. Default is false"
+        }
+      }
+    },
+    "pipeline": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/pipelineStage"
+      },
+      "description": "List of deployment pipeline stages."
+    },
+    "pipelineStage": {
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique ID of the stage."
+        },
+        "name": {
+          "type": "string",
+          "description": "One of the provided stage names."
+        },
+        "desc": {
+          "type": "string",
+          "description": "The description about the stage."
+        },
+        "timeout": {
+          "type": "string",
+          "description": "The maximum time the stage can be taken to run."
+        },
+        "with": {
+          "$ref": "#/definitions/stagesOption",
+          "description": "Specific configuration for the stage. This must be one of these StageOptions."
+        }
+      }
+    },
+    "stagesOption": {
+      "properties": {
+        "suffix": {
+          "type": "string",
+          "default": "primary",
+          "description": "Suffix that should be used when naming the PRIMARY variant’s resources. Default is primary."
+        },
+        "createService": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether the PRIMARY service should be created. Default is false."
+        },
+        "addVariantLabelToSelector": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether the PRIMARY variant label should be added to manifests if they were missing. Default is false."
+        },
+        "prune": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether the resources that are no longer defined in Git should be removed or not. Default is false"
+        }
+      }
+    },
+    "kubernetesService": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of Service manifest."
+        }
+      }
+    },
+    "kubernetesWorkload": {
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "Deployment"
+          ],
+          "description": "The kind name of workload manifests. Currently, only Deployment is supported. In the future, we also want to support ReplicationController, DaemonSet, StatefulSet."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of workload manifest."
+        }
+      }
+    },
+    "kubernetesTrafficRouting": {
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": [
+            "podselector",
+            "istio",
+            "smi"
+          ],
+          "default": "podselector",
+          "description": "Which traffic routing method will be used. Available values are istio, smi, podselector. Default is podselector."
+        },
+        "istio": {
+          "$ref": "#/definitions/istioTrafficRouting",
+          "description": "Istio configuration when the method is istio."
+        }
+      }
+    },
+    "istioTrafficRouting": {
+      "properties": {
+        "editableRoutes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of routes in the VirtualService that can be changed to update traffic routing. Empty means all routes should be updated."
+        },
+        "host": {
+          "type": "string",
+          "description": "The service host."
+        },
+        "virtualService": {
+          "$ref": "#/definitions/istioVirtualService",
+          "description": "The reference to VirtualService manifest. Empty means the first VirtualService resource will be used."
+        }
+      }
+    },
+    "istioVirtualService": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of VirtualService manifest."
+        }
+      }
+    },
+    "secretEncryption": {
+      "properties": {
+        "encryptedSecrets": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "List of encrypted secrets."
+        },
+        "decryptionTargets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of files to be decrypted before using."
+        }
+      }
+    },
+    "deploymentNotification": {
+      "properties": {
+        "mentions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/notificationMention"
+          },
+          "description": "List of users to be notified for each event."
+        }
+      }
+    },
+    "notificationMention": {
+      "properties": {
+        "required": [
+          "event"
+        ],
+        "event": {
+          "type": "string",
+          "description": "The event to be notified to users."
+        },
+        "slack": {
+          "type": "array",
+          "item": {
+            "type": "string"
+          },
+          "description": "List of user IDs for mentioning in Slack. See here for more information on how to check them."
+        }
+      }
+    },
+    "postSync": {
+      "properties": {
+        "chain": {
+          "$ref": "#/definitions/deploymentChain",
+          "description": "Deployment chain configuration, used to determine and build deployments that should be triggered once the current deployment is triggered."
+        }
+      }
+    },
+    "deploymentChain": {
+      "required": [
+        "applications"
+      ],
+      "properties": {
+        "applications": {
+          "type": "array",
+          "item": {
+            "$ref": "#/definitions/deploymentChainApplication"
+          },
+          "description": "The list of applications which should be triggered once deployment of this application rolled out successfully."
+        }
+      }
+    },
+    "deploymentChainApplication": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of PipeCD application, note that application name is not unique in PipeCD datastore"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "KUBERNETES",
+            "TERRAFORM",
+            "CLOUDRUN",
+            "LAMBDA",
+            "ECS"
+          ],
+          "description": "The kind of the PipeCD application, which should be triggered as a node in deployment chain. The value will be one of: KUBERNETES, TERRAFORM, CLOUDRUN, LAMBDA, ECS."
+        }
+      }
+    },
+    "kubernetesVariantLabel": {
+      "properties": {
+        "key": {
+          "type": "string",
+          "default": "pipecd.dev/variant",
+          "description": "The key of the label. Default is pipecd.dev/variant."
+        },
+        "primaryValue": {
+          "type": "string",
+          "default": "primary",
+          "description": "The label value for PRIMARY variant. Default is primary."
+        },
+        "canaryValue": {
+          "type": "string",
+          "default": "canary",
+          "description": "The label value for CANARY variant. Default is canary."
+        },
+        "baselineValue": {
+          "type": "string",
+          "default": "baseline",
+          "description": "The label value for BASELINE variant. Default is baseline."
+        }
+      }
+    }
+  },
+  "properties": {
+    "apiVersion": {
+      "type": "string",
+      "enum": [
+        "pipecd.dev/v1beta1"
+      ],
+      "description": "apiVersion"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "KubernetesApp",
+        "TerraformApp",
+        "CloudRunApp",
+        "LambdaApp",
+        "ECSApp",
+        "AnalysisTemplate",
+        "EventWatcher"
+      ],
+      "description": "kind"
+    },
+    "spec": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The application name."
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Additional attributes to identify applications."
+        },
+        "description": {
+          "type": "string",
+          "description": "Notes on the Application."
+        },
+        "input": {
+          "$ref": "#/definitions/kubernetesDeploymentInput",
+          "description": "Input for Kubernetes deployment such as kubectl version, helm version, manifests filter…"
+        },
+        "trigger": {
+          "$ref": "#/definitions/deploymentTrigger",
+          "description": "Configuration for trigger used to determine should we trigger a new deployment or not."
+        },
+        "planner": {
+          "$ref": "#/definitions/deploymentPlanner",
+          "description": "Configuration for planner used while planning deployment."
+        },
+        "commitMatcher": {
+          "$ref": "#/definitions/commitMatcher",
+          "description": "Forcibly use QuickSync or Pipeline when commit message matched the specified pattern."
+        },
+        "quickSync": {
+          "$ref": "#/definitions/kubernetesQuickSync",
+          "description": "Configuration for quick sync."
+        },
+        "pipeline": {
+          "$ref": "#/definitions/pipeline",
+          "description": "Pipeline for deploying progressively."
+        },
+        "service": {
+          "$ref": "#/definitions/kubernetesService",
+          "description": "Which Kubernetes resource should be considered as the Service of application. Empty means the first Service resource will be used."
+        },
+        "workloads": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/kubernetesWorkload"
+          },
+          "description": "Which Kubernetes resources should be considered as the Workloads of application. Empty means all Deployment resources."
+        },
+        "trafficRouting": {
+          "$ref": "#/definitions/kubernetesTrafficRouting",
+          "description": "How to change traffic routing percentages."
+        },
+        "triggerPaths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true,
+          "description": "List of directories or files where their changes will trigger the deployment. Regular expression can be used. This field is deprecated, please use spec.trigger.onCommit.paths instead."
+        },
+        "encryption": {
+          "$ref": "#/definitions/secretEncryption",
+          "description": "List of encrypted secrets and targets that should be decrypted before using."
+        },
+        "timeout": {
+          "type": "string",
+          "description": "The maximum length of time to execute deployment before giving up. Default is 6h."
+        },
+        "notification": {
+          "$ref": "#/definitions/deploymentNotification",
+          "description": "Additional configuration used while sending notification to external services."
+        },
+        "postSync": {
+          "$ref": "#/definitions/postSync",
+          "description": "Additional configuration used as extra actions once the deployment is triggered."
+        },
+        "variantLabel": {
+          "$ref": "#/definitions/kubernetesVariantLabel",
+          "description": "The label will be configured to variant manifests used to distinguish them."
+        }
+      }
+    }
+  }
+}
