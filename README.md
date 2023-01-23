@@ -5,7 +5,8 @@ This is the **unofficial** `pipecd.yaml` schenma for YAML LSP for the [PipeCD](h
 
 ### Coc
 [neoclide/coc.nvim: Nodejs extension host for vim & neovim, load extensions like VSCode and host language servers.](https://github.com/neoclide/coc.nvim)
-In Coc, `:CocConfig` in vim, and append the following lines.
+
+In Coc, hook open config with `:CocConfig` in vim, and append the following lines.
 
 ```json
 {
