@@ -1,6 +1,8 @@
 # pipiecd-json-schema
 This is the **unofficial** `pipecd.yaml` schenma for YAML LSP for the [PipeCD](https://github.com/pipe-cd/pipecd).
 
+*Supported PipeCD Version: v0.43.1*
+
 ## How to use
 
 ### AstroNvim
