@@ -199,15 +199,7 @@
           "type": "string"
         }
       },
-      "type": "object",
-      "required": [
-        "gitRemote",
-        "ref",
-        "path",
-        "repository",
-        "name",
-        "version"
-      ]
+      "type": "object"
     },
     "InputHelmOptions": {
       "properties": {
@@ -220,7 +212,7 @@
           },
           "type": "array"
         },
-        "SetFiles": {
+        "setFiles": {
           "patternProperties": {
             ".*": {
               "type": "string"
@@ -238,14 +230,7 @@
           "type": "string"
         }
       },
-      "type": "object",
-      "required": [
-        "releaseName",
-        "valueFiles",
-        "SetFiles",
-        "apiVersions",
-        "kubeVersion"
-      ]
+      "type": "object"
     },
     "K8sPrimaryRolloutStageOptions": {
       "properties": {
