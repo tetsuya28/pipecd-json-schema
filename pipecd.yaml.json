@@ -232,19 +232,40 @@
       },
       "type": "object"
     },
+    "IstioTrafficRouting": {
+      "properties": {
+        "editableRoutes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "host": {
+          "type": "string"
+        },
+        "virtualService": {
+          "$ref": "#/$defs/K8sResourceReference"
+        }
+      },
+      "type": "object"
+    },
     "K8sPrimaryRolloutStageOptions": {
       "properties": {
         "suffix": {
-          "type": "string"
+          "type": "string",
+          "default": "primary"
         },
         "createService": {
-          "type": "boolean"
+          "type": "boolean",
+          "default": false
         },
         "addVariantLabelToSelector": {
-          "type": "boolean"
+          "type": "boolean",
+          "default": false
         },
         "prune": {
-          "type": "boolean"
+          "type": "boolean",
+          "default": false
         }
       },
       "type": "object"
@@ -252,25 +273,26 @@
     "K8sResourceReference": {
       "properties": {
         "kind": {
-          "type": "string"
+          "type": "string",
+          "enum": [
+            "Deployment"
+          ]
         },
         "name": {
           "type": "string"
         }
       },
-      "type": "object",
-      "required": [
-        "kind",
-        "name"
-      ]
+      "type": "object"
     },
     "K8sSyncStageOptions": {
       "properties": {
         "addVariantLabelToSelector": {
-          "type": "boolean"
+          "type": "boolean",
+          "default": false
         },
         "prune": {
-          "type": "boolean"
+          "type": "boolean",
+          "default": false
         }
       },
       "type": "object",
@@ -330,6 +352,9 @@
           },
           "type": "array"
         },
+        "trafficRouting": {
+          "$ref": "#/$defs/KubernetesTrafficRouting"
+        },
         "variantLabel": {
           "$ref": "#/$defs/KubernetesVariantLabel"
         },
@@ -343,7 +368,8 @@
       "type": "object",
       "required": [
         "name",
-        "input"
+        "input",
+        "trafficRouting"
       ]
     },
     "KubernetesDeploymentInput": {
@@ -436,19 +462,40 @@
         "name"
       ]
     },
+    "KubernetesTrafficRouting": {
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": [
+            "istio",
+            "smi",
+            "podselector"
+          ],
+          "default": "podselector"
+        },
+        "istio": {
+          "$ref": "#/$defs/IstioTrafficRouting"
+        }
+      },
+      "type": "object"
+    },
     "KubernetesVariantLabel": {
       "properties": {
         "key": {
-          "type": "string"
+          "type": "string",
+          "default": "pipecd.dev/variant"
         },
         "primaryValue": {
-          "type": "string"
+          "type": "string",
+          "default": "primary"
         },
         "canaryValue": {
-          "type": "string"
+          "type": "string",
+          "default": "canary"
         },
         "baselineValue": {
-          "type": "string"
+          "type": "string",
+          "default": "baseline"
         }
       },
       "type": "object",
