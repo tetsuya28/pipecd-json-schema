@@ -3,6 +3,26 @@ This is the **unofficial** `pipecd.yaml` schenma for YAML LSP for the [PipeCD](h
 
 ## How to use
 
+### AstroNvim
+```lua
+return {
+  lsp = {
+    config = {
+      yamlls = {
+        settings = {
+          yaml = {
+            completion = true,
+            schemas = {
+              ["https://raw.githubusercontent.com/tetsuya28/pipecd-json-schema/master/pipecd.yaml.json"] = "app.pipecd.yaml",
+            },
+          },
+        },
+      },
+    },
+  },
+}
+```
+
 ### Coc
 [neoclide/coc.nvim: Nodejs extension host for vim & neovim, load extensions like VSCode and host language servers.](https://github.com/neoclide/coc.nvim)
 
