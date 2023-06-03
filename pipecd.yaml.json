@@ -12,13 +12,13 @@
         }
       ],
       "properties": {
-        "kind": {
+        "apiVersion": {
           "type": "string",
           "enum": [
             "pipecd.dev/v1beta1"
           ]
         },
-        "apiVersion": {
+        "kind": {
           "type": "string",
           "enum": [
             "KubernetesApp",
@@ -34,8 +34,8 @@
       },
       "type": "object",
       "required": [
-        "kind",
-        "apiVersion"
+        "apiVersion",
+        "kind"
       ]
     },
     "DeploymentNotification": {
@@ -368,8 +368,7 @@
       "type": "object",
       "required": [
         "name",
-        "input",
-        "trafficRouting"
+        "input"
       ]
     },
     "KubernetesDeploymentInput": {
