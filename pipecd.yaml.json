@@ -13,10 +13,20 @@
       ],
       "properties": {
         "kind": {
-          "type": "string"
+          "type": "string",
+          "enum": [
+            "pipecd.dev/v1beta1"
+          ]
         },
         "apiVersion": {
-          "type": "string"
+          "type": "string",
+          "enum": [
+            "KubernetesApp",
+            "TerraformApp",
+            "LambdaApp",
+            "CloudRunApp",
+            "ECSApp"
+          ]
         },
         "spec": {
           "$ref": "#/$defs/KubernetesApplicationSpec"
@@ -74,7 +84,10 @@
     "EventWatcherHandler": {
       "properties": {
         "type": {
-          "type": "string"
+          "type": "string",
+          "enum": [
+            "GIT_UPDATE"
+          ]
         },
         "config": {
           "$ref": "#/$defs/EventWatcherHandlerConfig"
