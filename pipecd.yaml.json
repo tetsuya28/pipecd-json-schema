@@ -82,6 +82,7 @@
       },
       "type": "object",
       "required": [
+        "type",
         "config"
       ]
     },
@@ -276,7 +277,6 @@
       },
       "type": "object",
       "required": [
-        "addVariantLabelToSelector",
         "prune"
       ]
     },
@@ -386,17 +386,7 @@
           "type": "boolean"
         }
       },
-      "type": "object",
-      "required": [
-        "manifests",
-        "kubectlVersion",
-        "kustomizeVersion",
-        "kustomizeOptions",
-        "helmVersion",
-        "helmChart",
-        "helmOptions",
-        "namespace"
-      ]
+      "type": "object"
     },
     "KubernetesProviderMatcher": {
       "properties": {
