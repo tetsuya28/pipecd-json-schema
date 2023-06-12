@@ -1,5 +1,5 @@
 # pipiecd-json-schema
-This is the **unofficial** `pipecd.yaml` schenma for YAML LSP for the [PipeCD](https://github.com/pipe-cd/pipecd).
+This is the **unofficial** `pipecd.yaml` schema for YAML LSP for the [PipeCD](https://github.com/pipe-cd/pipecd).
 
 *Supported PipeCD Version: v0.43.1*
 
